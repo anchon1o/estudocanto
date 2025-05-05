@@ -1,5 +1,5 @@
 const carpeta = 'repertorio/';
-const obras = ['dichterliebe.txt', 'winterreise.txt']; // esto puede automatizarse con un backend o lista JSON
+const obras = ['dichterliebe.txt']; // Añade aquí más archivos si los vas incluyendo
 
 let obraActual = null;
 let videoBase = '';
@@ -36,6 +36,10 @@ async function cargarObra(nombreArchivo) {
     b.onclick = () => mostrarMovimiento(i);
     document.getElementById('movimientos').appendChild(b);
   });
+
+  document.getElementById('texto').innerHTML = '';
+  document.getElementById('youtube').src = '';
+  document.getElementById('video').style.display = 'none';
 }
 
 function mostrarMovimiento(i) {
@@ -58,7 +62,7 @@ function mostrarMovimiento(i) {
   }
 
   m.content.forEach(l => {
-    if (!l.trim()) return;
+    if (!l.trim() || l.startsWith('//')) return;
     const partes = l.split('::');
     const div = document.createElement('div');
     div.className = 'verso';
