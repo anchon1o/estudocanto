@@ -1,81 +1,104 @@
 const carpeta = 'repertorio/';
-const obras = ['dichterliebe.txt']; // Añade aquí más archivos si los vas incluyendo
+const obras = ['dichterliebe.txt']; // Añadir más según crezcas
 
-let obraActual = null;
-let videoBase = '';
 let movimientos = [];
+let traducciones = [];
+let movimientoActual = 0;
+let videoBase = '';
 
-async function cargarObra(nombreArchivo) {
+function inicializar() {
+  const lista = document.getElementById('listaObras');
+  obras.forEach(nombre => {
+    const b = document.createElement('button');
+    const titulo = nombre.replace('.txt', '');
+    b.textContent = titulo;
+    b.onclick = () => seleccionarObra(nombre);
+    lista.appendChild(b);
+  });
+
+  document.getElementById('btnObra').onclick = volverASeleccion;
+  document.getElementById('btnToggleVideo').onclick = toggleVideo;
+  document.getElementById('btnTraduccion').onclick = toggleTraduccion;
+  document.getElementById('btnAnterior').onclick = () => cambiarMovimiento(-1);
+  document.getElementById('btnSiguiente').onclick = () => cambiarMovimiento(1);
+}
+
+function volverASeleccion() {
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('selectorObra').style.display = 'block';
+}
+
+async function seleccionarObra(nombreArchivo) {
   const texto = await fetch(carpeta + nombreArchivo).then(r => r.text());
   const lineas = texto.split('\n');
-  videoBase = '';
-  movimientos = [];
 
-  let buffer = [], movimiento = null;
+  movimientos = [];
+  traducciones = [];
+  videoBase = '';
+  let buffer = [], traduc = [], titulo = null;
+
   lineas.forEach(l => {
     if (l.startsWith('// youtube:')) {
       videoBase = l.replace('// youtube:', '').trim();
     } else if (l.startsWith('##')) {
-      if (movimiento) {
-        movimientos.push({ titulo: movimiento, contenido: buffer });
+      if (titulo) {
+        movimientos.push({ titulo, texto: buffer.join('\n'), traduccion: traduc.join('\n') });
       }
-      movimiento = l.replace('##', '').trim();
+      titulo = l.replace('##', '').trim();
       buffer = [];
-    } else {
-      buffer.push(l);
+      traduc = [];
+    } else if (l.includes('::')) {
+      const [o, t] = l.split('::');
+      buffer.push(o.trim());
+      traduc.push(t.trim());
+    } else if (!l.startsWith('//')) {
+      buffer.push(l.trim());
+      traduc.push('');
     }
   });
-  if (movimiento) {
-    movimientos.push({ titulo: movimiento, contenido: buffer });
+
+  if (titulo) {
+    movimientos.push({ titulo, texto: buffer.join('\n'), traduccion: traduc.join('\n') });
   }
 
-  document.getElementById('movimientos').innerHTML = '';
-  movimientos.forEach((m, i) => {
-    const b = document.createElement('button');
-    b.textContent = m.titulo;
-    b.onclick = () => mostrarMovimiento(i);
-    document.getElementById('movimientos').appendChild(b);
-  });
-
-  document.getElementById('texto').innerHTML = '';
-  document.getElementById('youtube').src = '';
-  document.getElementById('video').style.display = 'none';
+  movimientoActual = 0;
+  document.getElementById('selectorObra').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  mostrarBotonesMovimientos();
+  mostrarMovimiento();
 }
 
-function mostrarMovimiento(i) {
-  const m = movimientos[i];
-  const contenedor = document.getElementById('texto');
-  contenedor.innerHTML = '';
-  let start = 0;
-
-  m.content = m.contenido.filter(l => {
-    if (l.startsWith('// start:')) {
-      start = parseInt(l.replace('// start:', '').trim());
-      return false;
-    }
-    return true;
+function mostrarBotonesMovimientos() {
+  const cont = document.getElementById('botonesMovimientos');
+  cont.innerHTML = '';
+  movimientos.forEach((m, i) => {
+    const b = document.createElement('button');
+    b.textContent = romano(i + 1);
+    b.onclick = () => {
+      movimientoActual = i;
+      mostrarMovimiento();
+    };
+    cont.appendChild(b);
   });
+}
+
+function mostrarMovimiento() {
+  const m = movimientos[movimientoActual];
+  document.getElementById('textoOriginal').textContent = m.texto;
+  document.getElementById('textoTraduccion').textContent = m.traduccion;
+  document.getElementById('textoTraduccion').style.display = 'none';
 
   if (videoBase) {
-    const src = videoBase + (start ? `?start=${start}` : '');
-    document.getElementById('youtube').src = src;
+    document.getElementById('youtube').src = videoBase;
   }
+}
 
-  m.content.forEach(l => {
-    if (!l.trim() || l.startsWith('//')) return;
-    const partes = l.split('::');
-    const div = document.createElement('div');
-    div.className = 'verso';
-    div.textContent = partes[0].trim();
-    if (partes[1]) {
-      const trad = document.createElement('div');
-      trad.className = 'traduccion';
-      trad.textContent = partes[1].trim();
-      div.onclick = () => trad.style.display = trad.style.display === 'none' ? 'block' : 'none';
-      div.appendChild(trad);
-    }
-    contenedor.appendChild(div);
-  });
+function cambiarMovimiento(d) {
+  const nuevo = movimientoActual + d;
+  if (nuevo >= 0 && nuevo < movimientos.length) {
+    movimientoActual = nuevo;
+    mostrarMovimiento();
+  }
 }
 
 function toggleVideo() {
@@ -83,15 +106,14 @@ function toggleVideo() {
   v.style.display = v.style.display === 'none' ? 'block' : 'none';
 }
 
-// Inicializar lista de obras
-const divObras = document.getElementById('obras');
-obras.forEach(nombre => {
-  const b = document.createElement('button');
-  const titulo = nombre.replace('.txt', '');
-  b.textContent = titulo;
-  b.onclick = () => {
-    obraActual = nombre;
-    cargarObra(nombre);
-  };
-  divObras.appendChild(b);
-});
+function toggleTraduccion() {
+  const t = document.getElementById('textoTraduccion');
+  t.style.display = t.style.display === 'none' ? 'block' : 'none';
+}
+
+function romano(n) {
+  const r = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI'];
+  return r[n - 1] || n;
+}
+
+inicializar();
