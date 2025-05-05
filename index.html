@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Repertorio de Canto</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; background: #f5f5f5; }
+    #obras, #movimientos { margin-bottom: 20px; }
+    button { margin: 4px; }
+    .verso { cursor: pointer; padding: 4px; }
+    .verso:hover { background: #e0e0e0; }
+    .traduccion { color: gray; display: none; margin-left: 10px; }
+    #video { margin-top: 20px; display: none; }
+  </style>
+</head>
+<body>
+
+  <h1>Repertorio de Canto</h1>
+
+  <div id="obras"><strong>Selecciona una obra:</strong></div>
+  <div id="movimientos"><strong>Movimientos:</strong></div>
+
+  <button onclick="toggleVideo()">Mostrar/Ocultar Video</button>
+  <div id="video">
+    <iframe id="youtube" width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>
+  </div>
+
+  <div id="texto"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
