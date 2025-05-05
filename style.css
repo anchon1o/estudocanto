@@ -1,1 +1,79 @@
+body {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 20px;
+  background: #f9f9f9;
+}
 
+h1 {
+  margin-bottom: 1em;
+  text-align: center;
+}
+
+.grid-obras {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1em;
+}
+
+.grid-obras button {
+  padding: 1em;
+  min-width: 120px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.barra-superior, .barra-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.boton-carpeta {
+  background-color: orange;
+  color: white;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.separador-vertical {
+  width: 1px;
+  height: 30px;
+  background-color: #ccc;
+}
+
+.botonera button {
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.bloque-texto {
+  margin: 20px 0;
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+#btnTraduccion {
+  margin-bottom: 10px;
+}
+
+.bloque-traduccion {
+  font-style: italic;
+  color: #555;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
